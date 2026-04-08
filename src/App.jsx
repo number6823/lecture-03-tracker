@@ -9,6 +9,11 @@ function App() {
     // 데이터를 불러오는 중에는 true,데이터가 도착되면 false
 
     const [coins, setCoins] = useState([]); // 어떠한 목적의 state : 외부에서 받아오는 데이터를 저장할 목적의 state
+    const [selectedId, setSelectedId] = useState(""); //
+
+    const selectedCoin = coins.find(value => {
+        return value.id === selectedId;
+    });
 
     useEffect(() => {
         // 외부에서 데이터를 받아와서 coins에 저장하는 일
@@ -37,15 +42,82 @@ function App() {
                 <strong>데이터를 불러오는 중입니다...</strong>
             ) : (
                 <div>
-                    <select>
+                    <select
+                        value={selectedId}
+                        onChange={event => {
+                            // 사용자가 변경한 값을 저장해야 함
+                            setSelectedId(event.target.value);
+                        }}>
                         {coins.map((value, index) => {
                             return (
-                                <option key={index}>
+                                <option key={index} value={value.id}>
                                     {value.name}({value.symbol})
                                 </option>
                             );
                         })}
                     </select>
+
+                    {selectedCoin && (
+                        <div
+                            style={{
+                                marginTop: "20px",
+                                padding: "20px",
+                                border: "1px solid #ddd",
+                                borderRadius: "8px",
+                                backgroundColor: "#f9f9f9",
+                                maxWidth: "400px",
+                            }}>
+                            <h2 style={{ marginBottom: "15px" }}>
+                                {selectedCoin.name}{" "}
+                                <span style={{ color: "gray", fontSize: "1rem" }}>
+                                    {selectedCoin.symbol}
+                                </span>
+                            </h2>
+                            <ul
+                                style={{
+                                    listStyleType: "none",
+                                    padding: "0",
+                                    margin: "0",
+                                }}>
+                                <li>
+                                    {/* number 타입에 쓸 수 있는 메소드 .toFixed(숫자) : 소숫점 갯수 */}
+                                    <strong>현재 가격:</strong> ${" "}
+                                    {Number(selectedCoin.price_usd).toFixed(4)}
+                                </li>
+                                <li>
+                                    {" "}
+                                    {/* number 타입에 쓸 수 있는 메소드 .toLocaleStirng(): 숫자에 식별 콤마를 넣어 문자열로 변환 */}
+                                    {/* => 한국 컴퓨터에서 열면, 로 숫자를 나누는데 중동에서 열면. 로 숫자를 나눔 */}
+                                    <strong>시가 총액:</strong> ${" "}
+                                    {Number(selectedCoin.market_cap_usd).toLocaleString()}
+                                </li>
+                                <li>
+                                    <strong>1시간 변동률:</strong>{" "}
+                                    <span
+                                        style={{
+                                            color:
+                                                selectedCoin.percent_change_1h >= 0
+                                                    ? "red"
+                                                    : "blue",
+                                        }}>
+                                        {selectedCoin.percent_change_1h}%
+                                    </span>
+                                </li>
+                                <li>
+                                    <strong>24시간 변동률</strong>{" "}
+                                    <span
+                                        style={{
+                                            color:
+                                                selectedCoin.percent_change_24h >= 0
+                                                    ? "red"
+                                                    : "blue",
+                                        }}>
+                                        {selectedCoin.percent_change_24h}%
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                    )}
                 </div>
             )}
         </div>
